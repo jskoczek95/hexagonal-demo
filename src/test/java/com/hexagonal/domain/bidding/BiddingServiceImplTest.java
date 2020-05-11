@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 class BiddingServiceImplTest {
 
@@ -38,12 +39,13 @@ class BiddingServiceImplTest {
 
     private static class InMemoryTestBidStore implements BidStore {
         private final Map<Long, BidDto> memory = new HashMap<>();
+        private static final Logger LOGGER = Logger.getLogger(InMemoryTestBidStore.class.getName());
 
         @Override
         public void saveBid(BidDto bidDto) {
             memory.put(bidDto.getId(), bidDto);
-            System.out.println("Saved bid with id: " + bidDto.getId());
-            System.out.println("Current offers are: " + Arrays.toString(bidDto.getOffers().toArray()));
+            LOGGER.info("Saved bid with id: " + bidDto.getId());
+            LOGGER.info("Current offers are: " + Arrays.toString(bidDto.getOffers().toArray()));
         }
 
         @Override

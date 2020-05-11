@@ -6,9 +6,13 @@ import com.hexagonal.domain.bidding.port.shared.Offer;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.logging.Logger;
 
 @RequiredArgsConstructor
 class BiddingServiceImpl implements BiddingService {
+
+    //sl4fj from lombok doesnt work; look into it later
+    private static final Logger LOGGER = Logger.getLogger(BiddingServiceImpl.class.getName());
 
     private final BidStore bidStore;
 
@@ -24,5 +28,6 @@ class BiddingServiceImpl implements BiddingService {
         Bid bid = BiddingFactory.getInstance().toDomain(bidStore.loadBid(bidId));
         bid.addOffer(offer);
         bidStore.saveBid(BiddingFactory.getInstance().toSaveBid(bid));
+        LOGGER.info(String.format("User with id: %d has placed an offer on bid with id: %d", offer.getUserId(), bidId));
     }
 }
