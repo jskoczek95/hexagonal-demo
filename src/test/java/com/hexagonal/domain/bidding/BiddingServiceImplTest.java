@@ -2,7 +2,9 @@ package com.hexagonal.domain.bidding;
 
 import com.hexagonal.domain.bidding.port.in.BidStore;
 import com.hexagonal.domain.bidding.port.out.BiddingService;
+import com.hexagonal.domain.bidding.port.shared.Money;
 import com.hexagonal.domain.bidding.port.shared.Offer;
+import com.hexagonal.infrastructure.bidding.InMemoryBidStore;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
@@ -16,11 +18,11 @@ class BiddingServiceImplTest {
 
     @Test
     void createBid() {
-        BidStore bidStore = new InMemoryTestBidStore();
+        BidStore bidStore = new InMemoryBidStore();
         BiddingFacade biddingFacade = new BiddingFacade(bidStore);
 
         BiddingService biddingService = biddingFacade.getBiddingService();
-        Long bidId = biddingService.createBid("Sample title", "Sample description", BigDecimal.valueOf(25.20));
+        BidId bidId = biddingService.createBid("Sample title", "Sample description", new Money(25));
 
         BidStore.BidDto bidDto = bidStore.loadBid(bidId);
         Assert.assertNotNull(bidDto);
@@ -31,28 +33,29 @@ class BiddingServiceImplTest {
         BidStore bidStore = new InMemoryTestBidStore();
         BiddingFacade biddingFacade = new BiddingFacade(bidStore);
         BiddingService biddingService = biddingFacade.getBiddingService();
-        biddingService.createBid("Sample title", "Sample description", BigDecimal.valueOf(25.20));
+        BidId bidId = biddingService.createBid("Sample title", "Sample description", new Money(25));
         Offer offer = new Offer(5L, BigDecimal.valueOf(30));
 
-        biddingService.placeOffer(1L, offer);
+        biddingService.placeOffer(bidId, offer);
     }
 
     private static class InMemoryTestBidStore implements BidStore {
-        private final Map<Long, BidDto> memory = new HashMap<>();
+        private final Map<BidId, BidDto> memory = new HashMap<>();
         private static final Logger LOGGER = Logger.getLogger(InMemoryTestBidStore.class.getName());
 
         @Override
         public void saveBid(BidDto bidDto) {
-            memory.put(bidDto.getId(), bidDto);
-            LOGGER.info("Saved bid with id: " + bidDto.getId());
+            memory.put(bidDto.getBidId(), bidDto);
+            LOGGER.info("Saved bid with id: " + bidDto.getBidId().value());
             LOGGER.info("Current offers are: " + Arrays.toString(bidDto.getOffers().toArray()));
         }
 
         @Override
-        public BidDto loadBid(Long bidId) {
+        public BidDto loadBid(BidId bidId) {
             return memory.get(bidId);
         }
 
     }
+
 
 }

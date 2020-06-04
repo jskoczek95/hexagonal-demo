@@ -1,12 +1,12 @@
 package com.hexagonal.domain.bidding.port.out;
 
+import com.hexagonal.domain.bidding.BidId;
+import com.hexagonal.domain.bidding.port.shared.Money;
 import com.hexagonal.domain.bidding.port.shared.Offer;
-
-import java.math.BigDecimal;
 
 public interface BiddingService {
 
-    Long createBid(String title, String description, BigDecimal startingOffer);
+    BidId createBid(String title, String description, Money startingOffer);
 
-    void placeOffer(Long bidId, Offer offer);
+    void placeOffer(BidId bidId, Offer offer);
 }
